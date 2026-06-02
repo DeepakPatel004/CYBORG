@@ -5,7 +5,7 @@
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 ![Vanilla JS](https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E)
 
-A highly interactive, production-ready landing page featuring a dark-purple cybernetic aesthetic. Developed as **Task 1 (Web Development)** for the Techfest IIT Bombay College Ambassador Program. 
+A highly interactive, production-ready landing page featuring a dark-purple cybernetic aesthetic. Developed as **Task (Web Development)** for the Techfest IIT Bombay College Ambassador Program. 
 
 This project demonstrates advanced frontend capabilities, focusing on custom CSS animations, DOM manipulation, and immersive user micro-interactions without the use of external animation libraries.
 
