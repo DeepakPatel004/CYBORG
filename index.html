@@ -1,0 +1,138 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CYBERNETIC EVOLUTION</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="preloader" id="preloader">
+    <div class="boot-shell">
+      <div class="boot-title">SYSTEM BOOT</div>
+      <div class="boot-lines" id="bootLines"></div>
+    </div>
+  </div>
+  <main>
+    <section class="hero">
+      <video id="heroVideo" autoplay muted loop playsinline src="https://cdn.pixabay.com/video/2019/02/20/21535-318536292_large.mp4"></video>
+      <div class="video-overlay"></div>
+      <div class="hero-inner">
+        <h1 class="glitch" data-text="CYBERNETIC EVOLUTION">CYBERNETIC EVOLUTION</h1>
+        <p class="typing" data-text="Upgrade your biological limitations. Embrace the machine."></p>
+        <button class="mech-btn" id="cta"><span class="btn-label">INITIALIZE SEQUENCE</span><span class="spinner"></span><div class="scan"></div><div class="led"></div></button>
+      </div>
+    </section>
+
+    <section class="diagnostics reveal" id="diagnostics">
+      <h2 class="section-title">LIVE SYSTEM DIAGNOSTICS</h2>
+      <div class="diagnostics-grid">
+        <div class="diag-card">
+          <div class="diag-title">Core Temp <span class="status" data-key="temp">STABLE</span></div>
+          <div class="diag-value" id="tempValue">72°C</div>
+          <div class="diag-bar"><div class="diag-meter" id="tempBar" style="--w:72%"></div></div>
+        </div>
+        <div class="diag-card">
+          <div class="diag-title">Neural Sync <span class="status online" data-key="sync">ONLINE</span></div>
+          <div class="diag-value" id="syncValue">96%</div>
+          <div class="diag-bar"><div class="diag-meter" id="syncBar" style="--w:96%"></div></div>
+        </div>
+        <div class="diag-card">
+          <div class="diag-title">Network Latency <span class="status" data-key="latency">LOW</span></div>
+          <div class="diag-value" id="latencyValue">26 ms</div>
+          <div class="diag-bar"><div class="diag-meter" id="latencyBar" style="--w:66%"></div></div>
+        </div>
+        <div class="diag-card media-card">
+          <div class="media-shape"><img src="https://images.unsplash.com/photo-1555680202-c86f0e12f086?q=80&w=1200&auto=format&fit=crop" alt="photorealistic cyborg asset"></div>
+        </div>
+      </div>
+      <div class="terminal-console reveal">
+        <div class="terminal-header"><span>SYSTEM CONSOLE</span><span class="terminal-indicator"></span></div>
+        <div class="terminal-log" id="terminalLog"><div class="terminal-line">BOOT SEQUENCE INITIALIZED</div></div>
+        <form id="terminalForm" class="terminal-input"><span class="prompt">></span><input type="text" id="terminalCommand" placeholder="enter command" autocomplete="off"></form>
+      </div>
+    </section>
+
+    <section class="about reveal">
+      <div class="about-grid">
+        <div class="about-media">
+          <div class="media-shape"><img src="https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?q=80&w=1200&auto=format&fit=crop" alt="cyborg interface"></div>
+        </div>
+        <div class="about-copy">
+          <div class="info-panel">
+            <h2>CORE SYSTEMS INTEGRATION</h2>
+            <p>Photorealistic hardware renders processed through an ultraviolet neural matrix for a Techfest-grade presentation experience.</p>
+          </div>
+          <div class="about-bars">
+            <div class="bar-row"><span>Latency</span><div class="bar"><div class="meter" style="--w:94%"></div></div></div>
+            <div class="bar-row"><span>Encryption</span><div class="bar"><div class="meter" style="--w:89%"></div></div></div>
+            <div class="bar-row"><span>Autonomy</span><div class="bar"><div class="meter" style="--w:82%"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features reveal">
+      <h2 class="section-title">CYBORG CAPABILITIES</h2>
+      <div class="grid">
+        <article class="card" tabindex="0" data-detail="Synced sensors feed live topography to the optical array, creating predictive vision layers.">
+          <div class="card-body">
+            <h3>Optical Implants</h3>
+            <p>Augmented vision with spectral analysis.</p>
+          </div>
+        </article>
+        <article class="card" tabindex="0" data-detail="Neural cores maintain a sub-millisecond processing loop, translating intent into action instantly.">
+          <div class="card-body">
+            <h3>Neural Processors</h3>
+            <p>Low-latency thought acceleration.</p>
+          </div>
+        </article>
+        <article class="card" tabindex="0" data-detail="Adaptive titanium plating shifts on impact and amplifies system stability through kinetic feedback.">
+          <div class="card-body">
+            <h3>Titanium Chassis</h3>
+            <p>Reinforced exoskeletal frame.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="integrate reveal">
+      <h2 class="section-title">INTEGRATION REQUEST</h2>
+      <form id="integrateForm" class="form">
+        <div class="form-grid">
+          <label class="field"><input type="text" name="name" placeholder="Full designation" required></label>
+          <label class="field"><input type="email" name="email" placeholder="Contact matrix" required></label>
+          <label class="field full"><input type="text" name="unit" placeholder="Target unit / project" required></label>
+          <label class="toggle"><input type="checkbox" name="consent"><span class="switch"></span><span class="toggle-label">Authorize neural handshake</span></label>
+        </div>
+        <div class="form-actions">
+          <button class="mech-btn form-submit" type="submit"><span class="btn-label">REQUEST INTEGRATION</span><span class="spinner"></span><div class="scan"></div><div class="led"></div></button>
+          <div class="form-status" id="formStatus" aria-live="polite"></div>
+        </div>
+      </form>
+    </section>
+
+    <footer class="reveal">
+      <div class="footer-inner">
+        <div class="terminal-text">SYSTEM.DAT © 2026</div>
+        <div class="socials">
+          <a href="#">TWITTER</a>
+          <a href="#">GITHUB</a>
+          <a href="#">CONTACT</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+  <div class="detail-modal hidden" id="detailModal">
+    <div class="detail-shell">
+      <div class="detail-top">
+        <span class="detail-title" id="detailTitle">SYSTEM DETAIL</span>
+        <button class="close-btn" id="detailClose">CLOSE</button>
+      </div>
+      <div class="detail-copy" id="detailCopy">Select a capability card to reveal system intelligence.</div>
+    </div>
+  </div>
+</body>
+</html>
