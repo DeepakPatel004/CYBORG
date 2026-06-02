@@ -104,6 +104,74 @@ tiltables.forEach(el => {
     }, 450);
   });
 });
+const heroRing = document.querySelector('.hero-ring');
+const heroFloat = document.querySelector('.hero-float');
+const heroParticles = document.querySelector('.hero-particles');
+const aboutMedia = document.querySelector('.about-media');
+const resourceCards = document.querySelectorAll('.resource-card');
+let scrollTicking = false;
+let idleFrame = 0;
+function updateScrollMotion() {
+  const scrollY = window.scrollY;
+  if (heroVideo) {
+    heroVideo.style.transform = `translateY(${scrollY * 0.12}px) scale(1.08)`;
+  }
+  if (heroInner) {
+    heroInner.style.transform = `translateY(${Math.min(scrollY * 0.02, 24)}px)`;
+  }
+  if (heroRing) {
+    heroRing.style.transform = `translate(-50%, -50%) rotate(${scrollY * 0.03}deg)`;
+  }
+  if (heroFloat) {
+    heroFloat.style.transform = `translateY(${Math.sin(scrollY * 0.006) * 16}px)`;
+  }
+  if (heroParticles) {
+    heroParticles.style.transform = `translateY(${scrollY * 0.04}px)`;
+  }
+  if (aboutMedia) {
+    aboutMedia.style.transform = `translate3d(0, ${scrollY * 0.04}px, 0) rotate(${scrollY * 0.008}deg)`;
+  }
+  document.querySelectorAll('.card').forEach((card, index) => {
+    const rect = card.getBoundingClientRect();
+    const visible = rect.top < window.innerHeight && rect.bottom > 0;
+    if (!visible) {
+      return;
+    }
+    const offset = (window.innerHeight - rect.top) / window.innerHeight;
+    const drift = (offset - 0.5) * 18;
+    card.style.transform = `perspective(900px) translateY(${drift}px)`;
+  });
+  resourceCards.forEach((card, index) => {
+    card.style.transform = `translate3d(0, ${Math.sin((scrollY + index * 120) * 0.009) * 10}px, 0)`;
+    card.style.filter = `drop-shadow(0 0 ${8 + Math.sin((scrollY + index * 120) * 0.015) * 4}px rgba(142,0,255,0.28))`;
+  });
+}
+function animateIdleMotion() {
+  idleFrame += 0.016;
+  if (heroRing) {
+    heroRing.style.opacity = `${0.42 + Math.sin(idleFrame * 0.45) * 0.08}`;
+  }
+  if (heroFloat) {
+    heroFloat.style.opacity = `${0.82 + Math.sin(idleFrame * 0.72) * 0.08}`;
+  }
+  if (heroParticles) {
+    heroParticles.style.opacity = `${0.7 + Math.sin(idleFrame * 0.28) * 0.05}`;
+  }
+  requestAnimationFrame(animateIdleMotion);
+}
+window.addEventListener('scroll', () => {
+  if (!scrollTicking) {
+    window.requestAnimationFrame(() => {
+      updateScrollMotion();
+      scrollTicking = false;
+    });
+    scrollTicking = true;
+  }
+});
+window.addEventListener('load', () => {
+  updateScrollMotion();
+  requestAnimationFrame(animateIdleMotion);
+});
 const cards = document.querySelectorAll('.card');
 cards.forEach(card => {
   card.addEventListener('click', () => {
@@ -201,6 +269,91 @@ setInterval(simulateDiagnostics, 1500);
 simulateDiagnostics();
 const terminalForm = document.getElementById('terminalForm');
 const terminalCommand = document.getElementById('terminalCommand');
+const heroVideo = document.getElementById('heroVideo');
+const sections = {
+  home: document.querySelector('.hero'),
+  diagnostics: document.getElementById('diagnostics'),
+  about: document.querySelector('.about'),
+  capabilities: document.querySelector('.features'),
+  integrate: document.querySelector('.integrate')
+};
+function scrollToSection(name) {
+  const target = sections[name];
+  if (!target) {
+    return false;
+  }
+  target.scrollIntoView({behavior: 'smooth', block: 'start'});
+  pushTerminal(`scrolling to ${name}`);
+  return true;
+}
+function showMenu() {
+  pushTerminal('cmd menu:');
+  pushTerminal('home · diagnostics · about · capabilities · integrate');
+  pushTerminal('video · cta · detail [1-3] · help · clear · status · reboot · logs');
+}
+function openCardDetail(arg) {
+  const index = Number(arg) - 1;
+  if (!Number.isNaN(index) && cards[index]) {
+    const title = cards[index].querySelector('h3')?.textContent || 'SYSTEM CAPABILITY';
+    const copy = cards[index].getAttribute('data-detail') || 'No additional details available.';
+    openDetail(title, copy);
+    return true;
+  }
+  const match = Array.from(cards).find(card => card.querySelector('h3')?.textContent.toLowerCase().includes(arg.toLowerCase()));
+  if (match) {
+    const title = match.querySelector('h3')?.textContent || 'SYSTEM CAPABILITY';
+    const copy = match.getAttribute('data-detail') || 'No additional details available.';
+    openDetail(title, copy);
+    return true;
+  }
+  return false;
+}
+function processCommand(command) {
+  const parts = command.trim().split(' ').filter(Boolean);
+  const action = parts[0]?.toLowerCase();
+  const target = parts.slice(1).join(' ').trim();
+  if (!action) {
+    return;
+  }
+  if (action === 'help' || action === 'menu') {
+    showMenu();
+  } else if (action === 'clear') {
+    const log = document.getElementById('terminalLog');
+    if (log) {
+      log.innerHTML = '';
+    }
+  } else if (action === 'status') {
+    pushTerminal('SYSTEM STATUS: CORE STABLE | NETWORK LOW | INTEGRATION READY');
+  } else if (action === 'reboot') {
+    pushTerminal('REBOOT SEQUENCE ENGAGED...');
+    setTimeout(() => pushTerminal('RESTART COMPLETE'), 800);
+  } else if (action === 'logs') {
+    pushTerminal('log count: ' + commandHistory.length);
+  } else if (action === 'home' || action === 'diagnostics' || action === 'about' || action === 'capabilities' || action === 'integrate') {
+    if (!scrollToSection(action)) {
+      pushTerminal(`unknown section: ${action}`);
+    }
+  } else if (action === 'video') {
+    if (!heroVideo) {
+      pushTerminal('video control unavailable');
+    } else {
+      heroVideo.muted = !heroVideo.muted;
+      pushTerminal(`video ${heroVideo.muted ? 'muted' : 'unmuted'}`);
+    }
+  } else if (action === 'cta') {
+    const cta = document.getElementById('cta');
+    if (cta) {
+      cta.click();
+      pushTerminal('cta triggered');
+    }
+  } else if (action === 'detail') {
+    if (!target || !openCardDetail(target)) {
+      pushTerminal('detail command usage: detail 1 | detail optical | detail neural');
+    }
+  } else {
+    pushTerminal(`UNKNOWN COMMAND: ${command}`);
+  }
+}
 if (terminalForm) {
   terminalForm.addEventListener('submit', e => {
     e.preventDefault();
@@ -211,24 +364,7 @@ if (terminalForm) {
     pushTerminal(`> ${command}`);
     commandHistory.push(command);
     historyIndex = commandHistory.length;
-    const lower = command.toLowerCase();
-    if (lower === 'help') {
-      pushTerminal('commands: help | clear | status | reboot | logs');
-    } else if (lower === 'clear') {
-      const log = document.getElementById('terminalLog');
-      if (log) {
-        log.innerHTML = '';
-      }
-    } else if (lower === 'status') {
-      pushTerminal('SYSTEM STATUS: CORE STABLE | NETWORK LOW | INTEGRATION READY');
-    } else if (lower === 'reboot') {
-      pushTerminal('REBOOT SEQUENCE ENGAGED...');
-      setTimeout(() => pushTerminal('RESTART COMPLETE'), 800);
-    } else if (lower === 'logs') {
-      pushTerminal('log count: ' + commandHistory.length);
-    } else {
-      pushTerminal(`UNKNOWN COMMAND: ${command}`);
-    }
+    processCommand(command);
     terminalCommand.value = '';
   });
   terminalCommand.addEventListener('keydown', e => {
@@ -251,6 +387,16 @@ if (terminalForm) {
     }
   });
 }
+const cmdItems = document.querySelectorAll('.cmd-item');
+cmdItems.forEach(item => {
+  item.addEventListener('click', () => {
+    if (!terminalCommand) {
+      return;
+    }
+    terminalCommand.value = item.textContent || '';
+    terminalCommand.focus();
+  });
+});
 const integrateForm = document.getElementById('integrateForm');
 const formStatus = document.getElementById('formStatus');
 const formButton = document.querySelector('.form-submit');
