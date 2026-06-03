@@ -47,6 +47,81 @@ const detailModal = document.getElementById('detailModal');
 const detailTitle = document.getElementById('detailTitle');
 const detailCopy = document.getElementById('detailCopy');
 const detailClose = document.getElementById('detailClose');
+let mouseX = 0, mouseY = 0;
+let cursorX = 0, cursorY = 0;
+let lastParticleTime = 0;
+const particlePool = [];
+const maxParticles = 12;
+
+// Optimized mouse tracking with efficient particles
+document.addEventListener('mousemove', e => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  document.body.classList.add('cursor-active');
+  
+  // Update cursor position directly with CSS variables - no easing needed for snappy feel
+  document.body.style.setProperty('--cursor-x', `${mouseX}px`);
+  document.body.style.setProperty('--cursor-y', `${mouseY}px`);
+  
+  // Particle generation - less frequent
+  const now = Date.now();
+  if (now - lastParticleTime > 40 && particlePool.length < maxParticles) {
+    createParticle(mouseX, mouseY);
+    lastParticleTime = now;
+  }
+});
+
+function createParticle(x, y) {
+  let particle = particlePool.pop();
+  
+  if (!particle) {
+    particle = document.createElement('div');
+    particle.className = 'cursor-particle';
+    document.body.appendChild(particle);
+  }
+  
+  const angle = Math.random() * Math.PI * 2;
+  const velocity = 1.5 + Math.random() * 2.5;
+  let vx = Math.cos(angle) * velocity;
+  let vy = Math.sin(angle) * velocity;
+  const size = 2 + Math.random() * 3;
+  
+  particle.style.left = x + 'px';
+  particle.style.top = y + 'px';
+  particle.style.width = size + 'px';
+  particle.style.height = size + 'px';
+  particle.style.opacity = '1';
+  
+  let lifetime = 0;
+  let px = x, py = y;
+  let animFrameId;
+  
+  const animate = () => {
+    lifetime += 0.08;
+    px += vx;
+    py += vy;
+    vy += 0.1; // gravity
+    
+    const progress = Math.min(lifetime / 0.8, 1);
+    particle.style.left = px + 'px';
+    particle.style.top = py + 'px';
+    particle.style.opacity = (1 - progress * 1.2).toFixed(2);
+    particle.style.transform = `scale(${1 - progress * 0.6})`;
+    
+    if (progress < 1) {
+      animFrameId = requestAnimationFrame(animate);
+    } else {
+      cancelAnimationFrame(animFrameId);
+      particlePool.push(particle);
+    }
+  };
+  
+  animate();
+}
+
+document.addEventListener('mouseleave', () => {
+  document.body.classList.remove('cursor-active');
+});
 const commandHistory = [];
 let historyIndex = -1;
 function openDetail(title, copy) {
@@ -94,14 +169,11 @@ tiltables.forEach(el => {
     const ry = (x - cx) / cx;
     const rotX = rx * 6;
     const rotY = ry * 6;
-    el.style.transform = `perspective(900px) rotateX(${-rotX}deg) rotateY(${rotY}deg) translateZ(6px)`;
+    el.style.transform = `perspective(1000px) rotateX(${-rotX}deg) rotateY(${rotY}deg)`;
   });
   el.addEventListener('mouseleave', () => {
     el.style.transform = '';
-    el.style.transition = 'transform .45s cubic-bezier(.2,.9,.2,.9)';
-    setTimeout(() => {
-      el.style.transition = '';
-    }, 450);
+    el.style.boxShadow = '';
   });
 });
 const heroRing = document.querySelector('.hero-ring');
@@ -190,20 +262,16 @@ buttons.forEach(button => {
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
     const distance = Math.hypot(x, y);
-    const max = 24;
-    const strength = Math.min(1, 140 / (distance || 1));
-    const tx = (x / rect.width) * max * strength;
-    const ty = (y / rect.height) * max * strength;
-    button.style.transform = `translate3d(${tx}px, ${ty}px, 0) scale(${1 + strength * 0.01})`;
-    button.style.boxShadow = `0 18px 68px rgba(176,38,255,0.42), ${tx * 1.4}px ${ty * 1.4}px 54px rgba(138,43,226,0.22)`;
+    const strength = Math.min(1, 120 / (distance || 1));
+    const tx = (x / rect.width) * 20 * strength;
+    const ty = (y / rect.height) * 20 * strength;
+    const scale = 1 + strength * 0.015;
+    button.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+    button.style.boxShadow = `0 18px 64px rgba(176,38,255,0.45), ${tx * 1.2}px ${ty * 1.2}px 48px rgba(138,43,226,0.25)`;
   });
   button.addEventListener('mouseleave', () => {
     button.style.transform = '';
     button.style.boxShadow = '';
-    button.style.transition = 'transform .35s ease, box-shadow .35s ease';
-    setTimeout(() => {
-      button.style.transition = '';
-    }, 350);
   });
   button.addEventListener('click', () => {
     pushTerminal('control sequence engaged');
@@ -289,7 +357,7 @@ function scrollToSection(name) {
 function showMenu() {
   pushTerminal('cmd menu:');
   pushTerminal('home · diagnostics · about · capabilities · integrate');
-  pushTerminal('video · cta · detail [1-3] · help · clear · status · reboot · logs');
+  pushTerminal('video · cta · detail [1-3] · help · clear · status · reboot · logs · shortcuts · stats · neural');
 }
 function openCardDetail(arg) {
   const index = Number(arg) - 1;
@@ -349,6 +417,16 @@ function processCommand(command) {
   } else if (action === 'detail') {
     if (!target || !openCardDetail(target)) {
       pushTerminal('detail command usage: detail 1 | detail optical | detail neural');
+    }
+  } else if (action === 'shortcuts') {
+    toggleShortcuts();
+  } else if (action === 'stats') {
+    pushTerminal('neural_pathways: 2840 | efficiency: 94.7% | cycles: 1284 | uptime: 99.2%');
+  } else if (action === 'neural') {
+    const neuralSection = document.querySelector('.neural-viz');
+    if (neuralSection) {
+      neuralSection.scrollIntoView({behavior: 'smooth', block: 'start'});
+      pushTerminal('neural network interface loaded');
     }
   } else {
     pushTerminal(`UNKNOWN COMMAND: ${command}`);
@@ -443,16 +521,128 @@ if (integrateForm) {
     }, 2000);
   });
 }
+const shortcutsModal = document.getElementById('shortcutsModal');
+const shortcutsClose = document.getElementById('shortcutsClose');
+function toggleShortcuts() {
+  if (shortcutsModal?.classList.contains('hidden')) {
+    shortcutsModal.classList.remove('hidden');
+    pushTerminal('help: keyboard shortcuts displayed');
+  } else {
+    closeShortcuts();
+  }
+}
+function closeShortcuts() {
+  if (shortcutsModal) {
+    shortcutsModal.classList.add('hidden');
+  }
+}
+if (shortcutsClose) {
+  shortcutsClose.addEventListener('click', closeShortcuts);
+}
+const statCards = document.querySelectorAll('.stat-value');
+function animateCounters() {
+  statCards.forEach(card => {
+    const target = Number(card.getAttribute('data-target'));
+    let current = 0;
+    const increment = target / 60;
+    const interval = setInterval(() => {
+      current += increment;
+      if (current >= target) {
+        card.textContent = target;
+        clearInterval(interval);
+      } else {
+        card.textContent = Math.floor(current);
+      }
+    }, 30);
+  });
+}
+const statsPanel = document.querySelector('.stats-panel');
+if (statsPanel) {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !entry.target.dataset.animated) {
+        entry.target.dataset.animated = 'true';
+        animateCounters();
+      }
+    });
+  }, {threshold: 0.3});
+  observer.observe(statsPanel);
+}
+const canvas = document.getElementById('networkCanvas');
+if (canvas) {
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+  canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  const nodes = [];
+  const nodeCount = 18;
+  for (let i = 0; i < nodeCount; i++) {
+    nodes.push({
+      x: Math.random() * canvas.offsetWidth,
+      y: Math.random() * canvas.offsetHeight,
+      vx: (Math.random() - 0.5) * 1.4,
+      vy: (Math.random() - 0.5) * 1.4,
+      size: Math.random() * 3 + 2,
+      glow: 0
+    });
+  }
+  let time = 0;
+  function drawNetwork() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+    time += 0.01;
+    nodes.forEach(node => {
+      node.x += node.vx;
+      node.y += node.vy;
+      if (node.x < 0) node.x = canvas.offsetWidth;
+      if (node.x > canvas.offsetWidth) node.x = 0;
+      if (node.y < 0) node.y = canvas.offsetHeight;
+      if (node.y > canvas.offsetHeight) node.y = 0;
+      node.glow = Math.sin(time * 2 + Math.random()) * 0.5 + 0.5;
+    });
+    nodes.forEach((node, i) => {
+      nodes.slice(i + 1).forEach(other => {
+        const dx = node.x - other.x;
+        const dy = node.y - other.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          ctx.strokeStyle = `rgba(176, 38, 255, ${0.3 * (1 - dist / 120)})`;
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(node.x, node.y);
+          ctx.lineTo(other.x, other.y);
+          ctx.stroke();
+        }
+      });
+    });
+    nodes.forEach(node => {
+      ctx.fillStyle = `rgba(176, 38, 255, ${0.7 + node.glow * 0.3})`;
+      ctx.shadowColor = `rgba(176, 38, 255, ${0.4 + node.glow * 0.3})`;
+      ctx.shadowBlur = 8 + node.glow * 4;
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, node.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.shadowColor = 'transparent';
+    requestAnimationFrame(drawNetwork);
+  }
+  drawNetwork();
+}
 document.addEventListener('keydown', e => {
   if ((e.key === ' ' || e.key === 'Enter') && document.activeElement?.classList.contains('card')) {
     document.activeElement.click();
   }
   if (e.key === 'Escape') {
     closeDetail();
+    closeShortcuts();
   }
   if ((e.ctrlKey && e.key === '`') || (e.altKey && e.key.toLowerCase() === 't')) {
     e.preventDefault();
     terminalCommand?.focus();
     pushTerminal('terminal focus engaged');
+  }
+  if (e.key === '?') {
+    e.preventDefault();
+    toggleShortcuts();
   }
 });

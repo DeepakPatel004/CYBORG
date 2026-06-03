@@ -7,6 +7,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
+  <style>
+    ::-webkit-scrollbar{width:12px}
+    ::-webkit-scrollbar-track{background:rgba(0,0,0,0.4)}
+    ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--purple),var(--accent));border-radius:999px;box-shadow:0 0 12px rgba(176,38,255,0.25);transition:box-shadow .3s ease}
+    ::-webkit-scrollbar-thumb:hover{box-shadow:0 0 24px rgba(176,38,255,0.45)}
+  </style>
 </head>
 <body>
   <div class="preloader" id="preloader">
@@ -27,6 +33,36 @@
       <div class="hero-ring"></div>
       <div class="hero-float"></div>
       <div class="hero-particles"></div>
+    </section>
+
+    <section class="stats-panel reveal">
+      <h2 class="section-title">SYSTEM METRICS</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" data-target="2840">0</div>
+          <div class="stat-label">Neural Pathways Active</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" data-target="94.7">0</div>
+          <div class="stat-label">Processing Efficiency %</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" data-target="1284">0</div>
+          <div class="stat-label">Optimization Cycles</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" data-target="99.2">0</div>
+          <div class="stat-label">System Uptime %</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="neural-viz reveal">
+      <h2 class="section-title">NEURAL NETWORK CORE</h2>
+      <div class="network-container">
+        <canvas id="networkCanvas"></canvas>
+        <div class="network-label">Live node processing • Adaptive mesh topology</div>
+      </div>
     </section>
 
     <section class="diagnostics reveal" id="diagnostics">
@@ -184,6 +220,21 @@
         <button class="close-btn" id="detailClose">CLOSE</button>
       </div>
       <div class="detail-copy" id="detailCopy">Select a capability card to reveal system intelligence.</div>
+    </div>
+  </div>
+  <div class="shortcuts-modal hidden" id="shortcutsModal">
+    <div class="shortcuts-shell">
+      <div class="shortcuts-top">
+        <span class="shortcuts-title">KEYBOARD SHORTCUTS</span>
+        <button class="shortcuts-close" id="shortcutsClose">CLOSE</button>
+      </div>
+      <div class="shortcuts-list">
+        <div class="shortcut-row"><kbd>Ctrl</kbd> + <kbd>`</kbd> Focus terminal</div>
+        <div class="shortcut-row"><kbd>Alt</kbd> + <kbd>T</kbd> Terminal focus</div>
+        <div class="shortcut-row"><kbd>Space</kbd> Activate card</div>
+        <div class="shortcut-row"><kbd>Esc</kbd> Close modal</div>
+        <div class="shortcut-row"><kbd>?</kbd> Show shortcuts</div>
+      </div>
     </div>
   </div>
 </body>
